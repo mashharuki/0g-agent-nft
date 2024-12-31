@@ -119,7 +119,7 @@ contract AgentNFT is IERC7844, IERC7844Metadata {
        TokenData storage token = _tokens[tokenId];
        require(token.owner == msg.sender, "Not owner");
        
-       AvailabilityProofOutput memory proofOupt = _verifier.verifyAvailable(proof);
+       TransferValidityProofOutput memory proofOupt = _verifier.verifyTransferValidity(proof);
        bytes32[] memory oldDataHashes = proofOupt.oldDataHashes;
        bytes32[] memory newDataHashes = proofOupt.newDataHashes;
        bytes32[] memory tokenDataHashes = token.dataHashes;
@@ -130,7 +130,7 @@ contract AgentNFT is IERC7844, IERC7844Metadata {
            proofOupt.isValid 
            && _isEqual(oldDataHashes, tokenDataHashes)
            && _pubKeyToAddress(pubKey) == to,
-           "Invalid availability proof"
+           "Invalid transfer validity proof"
        );
 
        token.owner = to;
@@ -159,7 +159,7 @@ contract AgentNFT is IERC7844, IERC7844Metadata {
        
        require(_tokens[tokenId].owner == msg.sender, "Not owner");
        
-       AvailabilityProofOutput memory proofOupt = _verifier.verifyAvailable(proof);
+       TransferValidityProofOutput memory proofOupt = _verifier.verifyTransferValidity(proof);
        bytes32[] memory oldDataHashes = proofOupt.oldDataHashes;
        bytes32[] memory newDataHashes = proofOupt.newDataHashes;
        bytes32[] memory tokenDataHashes = _tokens[tokenId].dataHashes;
@@ -170,7 +170,7 @@ contract AgentNFT is IERC7844, IERC7844Metadata {
            proofOupt.isValid 
            && _isEqual(oldDataHashes, tokenDataHashes)
            && _pubKeyToAddress(pubKey) == to,
-           "Invalid availability proof"
+           "Invalid transfer validity proof"
        );
 
        uint256 newTokenId = _nextTokenId++;
