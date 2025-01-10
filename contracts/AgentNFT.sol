@@ -1,37 +1,42 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "./interfaces/IERC7844.sol";
-import "./interfaces/IERC7844Metadata.sol";
-import "./interfaces/IERC7844DataVerifier.sol";
+import "./interfaces/IERC7857.sol";
+import "./interfaces/IERC7857Metadata.sol";
+import "./interfaces/IERC7857DataVerifier.sol";
+import "./Utils.sol";
 
-contract AgentNFT is IERC7844, IERC7844Metadata {
+contract AgentNFT is IERC7857, IERC7857Metadata {
    struct TokenData {
        address owner;
+       string[] dataDescriptions;
        bytes32[] dataHashes;
        address[] authorizedUsers;
    }
    
-   IERC7844DataVerifier private immutable _verifier;
+   IERC7857DataVerifier private immutable _verifier;
    mapping(uint256 => TokenData) private _tokens;
    uint256 private _nextTokenId;
 
    string private _name;
    string private _symbol;
-   string private _storageURL;
    address private immutable _owner;
+   string private _chainURL;
+   string private _indexerURL;
    
    constructor(
        string memory name_,
        string memory symbol_,
        address verifierAddr,
-       string memory storageURL_
+       string memory chainURL_,
+       string memory indexerURL_
    ) {
        require(verifierAddr != address(0), "Zero address");
-       _verifier = IERC7844DataVerifier(verifierAddr);
+       _verifier = IERC7857DataVerifier(verifierAddr);
        _name = name_;
        _symbol = symbol_;
-       _storageURL = storageURL_;
+       _chainURL = chainURL_;
+       _indexerURL = indexerURL_;
        _owner = msg.sender;
    }
 
@@ -43,33 +48,29 @@ contract AgentNFT is IERC7844, IERC7844Metadata {
        return _symbol;
    }
 
-   function config() external view returns (string memory) {
-       return _storageURL;
-   }
-
-   function setConfig(string memory storageURL) external {
-       require(msg.sender == _owner, "Not owner");
-       _storageURL = storageURL;
-   }
-
-   function tokenURI(uint256 tokenId) external view returns (string memory) {
-       require(_exists(tokenId), "Token does not exist");
-       return string(abi.encodePacked(_storageURL));
-   }
 
    function update(
        uint256 tokenId,
-       bytes calldata proof
+       bytes[] calldata proofs
    ) external {
        TokenData storage token = _tokens[tokenId];
        require(token.owner == msg.sender, "Not owner");
        
-       OwnershipProofOutput memory proofOupt = _verifier.verifyOwnership(proof);
-       bytes32[] memory newDataHashes = proofOupt.dataHashes;
-       require(
-           proofOupt.isValid,
-           "Invalid ownership proof"
-       );
+       OwnershipProofOutput[] memory proofOupt = _verifier.verifyOwnership(proofs);
+       bytes32[] memory newDataHashes = new bytes32[](proofOupt.length);
+
+       for (uint i = 0; i < proofOupt.length; i++) {
+           require(
+               proofOupt[i].isValid,
+               string(abi.encodePacked(
+                    "Invalid ownership proof at index ",
+                    i,
+                    " with data hash ",
+                    proofOupt[i].dataHash
+                ))
+           );
+           newDataHashes[i] = proofOupt[i].dataHash;
+       }
 
        bytes32[] memory oldDataHashes = token.dataHashes;
        token.dataHashes = newDataHashes;
@@ -77,36 +78,65 @@ contract AgentNFT is IERC7844, IERC7844Metadata {
        emit Updated(tokenId, oldDataHashes, newDataHashes);
    }
    
-   function dataHashesOf(uint256 tokenId) external view returns (bytes32[] memory) {
+   function dataHashesOf(uint256 tokenId) public view returns (bytes32[] memory) {
        TokenData storage token = _tokens[tokenId];
        require(token.owner != address(0), "Token not exist");
        return token.dataHashes;
    }
 
-   function verifier() external view returns (IERC7844DataVerifier) {
+   function dataDescriptionsOf(uint256 tokenId) public view returns (string[] memory) {
+       TokenData storage token = _tokens[tokenId];
+       require(token.owner != address(0), "Token not exist");
+       return token.dataDescriptions;
+   }
+
+   function tokenURI(uint256 tokenId) external view returns (string memory) {
+       require(_exists(tokenId), "Token does not exist");
+       bytes32[] memory dataHashes = dataHashesOf(tokenId);
+       
+       string memory result = string(abi.encodePacked(
+           "chainURL: ", _chainURL, "\n",
+           "indexerURL: ", _indexerURL, "\n"
+       ));
+       return result;
+   }
+
+   function verifier() external view returns (IERC7857DataVerifier) {
        return _verifier;
    }
    
-   function mint(bytes calldata proof) 
+   function mint(bytes[] calldata proofs, string[] calldata dataDescriptions) 
        external 
        payable 
        returns (uint256 tokenId) 
    {
-       OwnershipProofOutput memory proofOupt = _verifier.verifyOwnership(proof);
-       bytes32[] memory dataHashes = proofOupt.dataHashes;
-       require(
-           proofOupt.isValid,
-           "Invalid ownership proof"
-       );
+       require(dataDescriptions.length == proofs.length, "Descriptions and proofs length mismatch");
+
+       OwnershipProofOutput[] memory proofOupt = _verifier.verifyOwnership(proofs);
+       bytes32[] memory dataHashes = new bytes32[](proofOupt.length);
+
+       for (uint i = 0; i < proofOupt.length; i++) {
+           require(
+               proofOupt[i].isValid,
+               string(abi.encodePacked(
+                    "Invalid ownership proof at index ",
+                    i,
+                    " with data hash ",
+                    proofOupt[i].dataHash
+                ))
+           );
+           dataHashes[i] = proofOupt[i].dataHash;
+       }
 
        tokenId = _nextTokenId++;
        _tokens[tokenId] = TokenData({
            owner: msg.sender,
            dataHashes: dataHashes,
+           dataDescriptions: dataDescriptions,
            authorizedUsers: new address[](0)
        });
        
-       emit Minted(tokenId, msg.sender, dataHashes);
+       emit Minted(tokenId, msg.sender, dataHashes, dataDescriptions);
    }
 
    function transfer(
@@ -128,8 +158,8 @@ contract AgentNFT is IERC7844, IERC7844Metadata {
        
        require(
            proofOupt.isValid 
-           && _isEqual(oldDataHashes, tokenDataHashes)
-           && _pubKeyToAddress(pubKey) == to,
+           && Utils.isEqual(oldDataHashes, tokenDataHashes)
+           && Utils.pubKeyToAddress(pubKey) == to,
            "Invalid transfer validity proof"
        );
 
@@ -168,8 +198,8 @@ contract AgentNFT is IERC7844, IERC7844Metadata {
        
        require(
            proofOupt.isValid 
-           && _isEqual(oldDataHashes, tokenDataHashes)
-           && _pubKeyToAddress(pubKey) == to,
+           && Utils.isEqual(oldDataHashes, tokenDataHashes)
+           && Utils.pubKeyToAddress(pubKey) == to,
            "Invalid transfer validity proof"
        );
 
@@ -177,6 +207,7 @@ contract AgentNFT is IERC7844, IERC7844Metadata {
        _tokens[newTokenId] = TokenData({
            owner: to,
            dataHashes: newDataHashes,
+           dataDescriptions: _tokens[tokenId].dataDescriptions,
            authorizedUsers: new address[](0)
        });
 
@@ -196,6 +227,7 @@ contract AgentNFT is IERC7844, IERC7844Metadata {
        _tokens[newTokenId] = TokenData({
            owner: to,
            dataHashes: _tokens[tokenId].dataHashes,
+           dataDescriptions: _tokens[tokenId].dataDescriptions,
            authorizedUsers: new address[](0)
        });
        emit Cloned(tokenId, newTokenId, msg.sender, to);
@@ -224,41 +256,4 @@ contract AgentNFT is IERC7844, IERC7844Metadata {
    function _exists(uint256 tokenId) internal view returns (bool) {
        return _tokens[tokenId].owner != address(0);
    }
-
-   function _toString(uint256 value) internal pure returns (string memory) {
-       if (value == 0) {
-           return "0";
-       }
-       uint256 temp = value;
-       uint256 digits;
-       while (temp != 0) {
-           digits++;
-           temp /= 10;
-       }
-       bytes memory buffer = new bytes(digits);
-       while (value != 0) {
-           digits -= 1;
-           buffer[digits] = bytes1(uint8(48 + uint256(value % 10)));
-           value /= 10;
-       }
-       return string(buffer);
-   }
-
-   function _isEqual(bytes32[] memory arr1, bytes32[] memory arr2) private pure returns (bool) {
-        if (arr1.length != arr2.length) {
-            return false;
-        }
-        for (uint i = 0; i < arr1.length; i++) {
-            if (arr1[i] != arr2[i]) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    function _pubKeyToAddress(bytes memory pubKey) private pure returns (address) {
-        require(pubKey.length == 64, "Invalid public key length");
-        bytes32 hash = keccak256(pubKey);
-        return address(uint160(uint256(hash)));
-    }
 }

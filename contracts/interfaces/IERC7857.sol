@@ -1,14 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.20;
 
-import "./IERC7844DataVerifier.sol";
+import "./IERC7857DataVerifier.sol";
 
-interface IERC7844 {
+interface IERC7857 {
     /// @dev This emits when a new functional NFT is minted
     event Minted(
         uint256 indexed _tokenId,
         address indexed _creator,
-        bytes32[] _dataHashes
+        bytes32[] _dataHashes,
+        string[] _dataDescriptions
     );
 
     /// @dev This emits when a user is authorized to use the data
@@ -41,12 +42,13 @@ interface IERC7844 {
 
     /// @notice The verifier interface that this NFT uses
     /// @return The address of the verifier contract
-    function verifier() external view returns (IERC7844DataVerifier);
+    function verifier() external view returns (IERC7857DataVerifier);
 
     /// @notice Mint new functional NFT with functional data ownership proof
-    /// @param _proof Proof of data ownership   
+    /// @param _proofs Proof of data ownership   
+    /// @param _dataDescriptions Descriptions of the data
     /// @return _tokenId The ID of the newly minted token
-    function mint(bytes calldata _proof)
+    function mint(bytes[] calldata _proofs, string[] calldata _dataDescriptions)
         external
         payable
         returns (uint256 _tokenId);

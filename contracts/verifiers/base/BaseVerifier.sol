@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "../../interfaces/IERC7844DataVerifier.sol";
+import "../../interfaces/IERC7857DataVerifier.sol";
 
-abstract contract BaseVerifier is IERC7844DataVerifier {
+abstract contract BaseVerifier is IERC7857DataVerifier {
     // prevent replay attack
     mapping(bytes32 => bool) internal usedProofs;
     

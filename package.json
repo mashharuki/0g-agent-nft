@@ -4,15 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "setup": "ts-node scripts/build.ts",
     "compile": "hardhat compile",
-    "test": "hardhat test",
-    "deploy": "hardhat run scripts/deploy.ts",
+    "test": "hardhat test --network localhost",
+    "deploy": "hardhat run scripts/deploy.ts --network localhost",
     "deploy:goerli": "hardhat run scripts/deploy.ts --network goerli",
     "verify": "hardhat verify",
     "coverage": "hardhat coverage"
   },
   "keywords": [],
-  "author": "",
+  "author": "wei <wei.wu.life@gmail.com>",
   "license": "ISC",
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.8",
@@ -21,6 +22,7 @@
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "@nomicfoundation/hardhat-verify": "^2.0.12",
     "@openzeppelin/contracts": "^5.1.0",
+    "@typechain/ethers-v5": "^11.1.2",
     "@typechain/ethers-v6": "^0.5.1",
     "@typechain/hardhat": "^9.1.0",
     "@types/chai": "^5.0.1",
@@ -32,6 +34,11 @@
     "hardhat-gas-reporter": "^2.2.2",
     "solidity-coverage": "^0.8.14",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "dotenv": "^16.4.7"
+  },
+  "repository": "https://github.com/0glabs/0g-agent-nft.git",
+  "dependencies": {
+    "typechain": "^8.3.0"
   }
 }

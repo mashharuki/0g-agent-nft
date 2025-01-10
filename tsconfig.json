@@ -8,6 +8,16 @@
     "skipLibCheck": true,
     "resolveJsonModule": true
   },
-  "include": ["./scripts", "./test", "./typechain-types"],
+  "include": [
+    "hardhat.config.ts",
+    "scripts/**/*.ts",
+    "test/**/*.ts",
+    "typechain/**/*.ts"
+  ],
+  "typechain": {
+    "outDir": "typechain",
+    "target": "ethers-v5",
+    "files": ["artifacts/contracts/**/*.json"]
+  },
   "files": ["./hardhat.config.ts"]
 }
