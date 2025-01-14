@@ -7,8 +7,9 @@
     "setup": "ts-node scripts/build.ts",
     "compile": "hardhat compile",
     "test": "hardhat test --network localhost",
+    "test:zgtestnet": "hardhat test --network zgTestnet",
     "deploy": "hardhat run scripts/deploy.ts --network localhost",
-    "deploy:goerli": "hardhat run scripts/deploy.ts --network goerli",
+    "deploy:zgtestnet": "hardhat run scripts/deploy.ts --network zgTestnet",
     "verify": "hardhat verify",
     "coverage": "hardhat coverage"
   },

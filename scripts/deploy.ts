@@ -4,7 +4,7 @@ async function main() {
   // 1. deploy TEEVerifier
   console.log("Deploying TEE Verifier...");
   const TEEVerifier = await ethers.getContractFactory("TEEVerifier");
-  const teeVerifier = await TEEVerifier.deploy("0x0000000000000000000000000000000000000000" /* attestation contract address */);
+  const teeVerifier = await TEEVerifier.deploy("0x0000000000000000000000000000000000000000");
   await teeVerifier.waitForDeployment();
   console.log("TEEVerifier deployed to:", teeVerifier.target);
 
