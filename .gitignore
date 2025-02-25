@@ -7,3 +7,4 @@ typechain-types
 dist
 cache
 artifacts
+deployments

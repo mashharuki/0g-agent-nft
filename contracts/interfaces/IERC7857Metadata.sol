@@ -21,18 +21,19 @@ interface IERC7857Metadata {
     /// @notice Update data
     /// @param _tokenId The token to update
     /// @param _proofs Proof of updated data ownership
-    function update(
-        uint256 _tokenId,
-        bytes[] calldata _proofs
-    ) external;
+    function update(uint256 _tokenId, bytes[] calldata _proofs) external;
 
     /// @notice Get the data hash of a token
     /// @param _tokenId The token identifier
     /// @return The current data hash of the token
-    function dataHashesOf(uint256 _tokenId) external view returns (bytes32[] memory);
+    function dataHashesOf(
+        uint256 _tokenId
+    ) external view returns (bytes32[] memory);
 
     /// @notice Get the data description of a token
     /// @param _tokenId The token identifier
     /// @return The current data description of the token
-    function dataDescriptionsOf(uint256 _tokenId) external view returns (string[] memory);
+    function dataDescriptionsOf(
+        uint256 _tokenId
+    ) external view returns (string[] memory);
 }

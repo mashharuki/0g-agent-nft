@@ -8,15 +8,13 @@ interface IERC7857 {
     event Minted(
         uint256 indexed _tokenId,
         address indexed _creator,
+        address indexed _owner,
         bytes32[] _dataHashes,
         string[] _dataDescriptions
     );
 
     /// @dev This emits when a user is authorized to use the data
-    event AuthorizedUsage(
-        uint256 indexed _tokenId,
-        address indexed _user
-    );
+    event AuthorizedUsage(uint256 indexed _tokenId, address indexed _user);
 
     /// @dev This emits when data is transferred with ownership
     event Transferred(
@@ -37,7 +35,7 @@ interface IERC7857 {
     event PublishedSealedKey(
         address indexed _to,
         uint256 indexed _tokenId,
-        bytes _sealedKey
+        bytes16[] _sealedKeys
     );
 
     /// @notice The verifier interface that this NFT uses
@@ -45,42 +43,41 @@ interface IERC7857 {
     function verifier() external view returns (IERC7857DataVerifier);
 
     /// @notice Mint new functional NFT with functional data ownership proof
-    /// @param _proofs Proof of data ownership   
+    /// @param _proofs Proof of data ownership
     /// @param _dataDescriptions Descriptions of the data
     /// @return _tokenId The ID of the newly minted token
-    function mint(bytes[] calldata _proofs, string[] calldata _dataDescriptions)
-        external
-        payable
-        returns (uint256 _tokenId);
+    /// @param _to The address to mint the token for, if _to is not set, the token will be minted for the caller
+    function mint(
+        bytes[] calldata _proofs,
+        string[] calldata _dataDescriptions,
+        address _to
+    ) external payable returns (uint256 _tokenId);
 
     /// @notice Transfer data with ownership
     /// @param _to Address to transfer data to
     /// @param _tokenId The token to transfer data for
-    /// @param _proof Proof of data available for _to
+    /// @param _proofs Proofs of data available for _to
     function transfer(
         address _to,
         uint256 _tokenId,
-        bytes calldata _proof
+        bytes[] calldata _proofs
     ) external;
 
     /// @notice Clone data
     /// @param _to Address to clone data to
     /// @param _tokenId The token to clone data for
-    /// @param _proof Proof of data available for _to
+    /// @param _proofs Proofs of data available for _to
     /// @return _newTokenId The ID of the newly cloned token
     function clone(
         address _to,
         uint256 _tokenId,
-        bytes calldata _proof
+        bytes[] calldata _proofs
     ) external payable returns (uint256 _newTokenId);
 
     /// @notice Transfer public data with ownership
     /// @param _to Address to transfer data to
     /// @param _tokenId The token to transfer data for
-    function transferPublic(
-        address _to,
-        uint256 _tokenId
-    ) external;
+    function transferPublic(address _to, uint256 _tokenId) external;
 
     /// @notice Clone public data
     /// @param _to Address to clone data to
@@ -93,10 +90,7 @@ interface IERC7857 {
 
     /// @notice Add authorized user to group
     /// @param _tokenId The token to add to group
-    function authorizeUsage(
-        uint256 _tokenId,
-        address _user
-    ) external;
+    function authorizeUsage(uint256 _tokenId, address _user) external;
 
     /// @notice Get token owner
     /// @param _tokenId The token identifier
@@ -106,5 +100,7 @@ interface IERC7857 {
     /// @notice Get the authorized users of a token
     /// @param _tokenId The token identifier
     /// @return The current authorized users of the token
-    function authorizedUsersOf(uint256 _tokenId) external view returns (address[] memory);
+    function authorizedUsersOf(
+        uint256 _tokenId
+    ) external view returns (address[] memory);
 }
