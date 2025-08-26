@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import 'hardhat-deploy';
 import 'hardhat-deploy-ethers';
 import { HardhatUserConfig } from 'hardhat/config';
+import "./tasks";
 dotenv.config();
 
 const ZG_TESTNET_PRIVATE_KEY = process.env.ZG_TESTNET_PRIVATE_KEY;
