@@ -19,8 +19,20 @@ ZG_AGENT_NFT_ALICE_PRIVATE_KEY=
 ZG_AGENT_NFT_BOB_PRIVATE_KEY=
 ```
 
-コンパイルする
+## コンパイル
 
 ```bash
 pnpm run compile
+```
+
+## デプロイ
+
+```bash
+pnpm run deploy --network zgTestnet
+```
+
+## upgrade
+
+```bash
+pnpm run upgrade --network zgTestnet
 ```

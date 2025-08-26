@@ -54,7 +54,7 @@ const config: HardhatUserConfig = {
     zgTestnet: {
       url: 'https://evmrpc-testnet.0g.ai',
       accounts: [ZG_TESTNET_PRIVATE_KEY || ''],
-      chainId: 16600,
+      chainId: 16601,
       live: true,
       saveDeployments: true,
       tags: ['staging'],
