@@ -11,6 +11,11 @@ import {
 } from "./interfaces/IERC7857DataVerifier.sol";
 import {Utils} from "./Utils.sol";
 
+/**
+ * @title Agent NFT
+ * @author 
+ * @notice 
+ */
 contract AgentNFT is AccessControlEnumerableUpgradeable, IERC7857, IERC7857Metadata {
   /// @custom:storage-location erc7201:agent.storage.AgentNFT
   struct AgentNFTStorage {
