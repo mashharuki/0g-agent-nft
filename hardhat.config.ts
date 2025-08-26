@@ -1,8 +1,8 @@
-import { HardhatUserConfig } from "hardhat/config";
-import "@nomicfoundation/hardhat-toolbox";
-import dotenv from "dotenv";
-import "hardhat-deploy";
-import "hardhat-deploy-ethers";
+import '@nomicfoundation/hardhat-toolbox';
+import dotenv from 'dotenv';
+import 'hardhat-deploy';
+import 'hardhat-deploy-ethers';
+import { HardhatUserConfig } from 'hardhat/config';
 dotenv.config();
 
 const ZG_TESTNET_PRIVATE_KEY = process.env.ZG_TESTNET_PRIVATE_KEY;
@@ -10,21 +10,22 @@ const ZG_AGENT_NFT_CREATOR_PRIVATE_KEY = process.env.ZG_AGENT_NFT_CREATOR_PRIVAT
 const ZG_AGENT_NFT_ALICE_PRIVATE_KEY = process.env.ZG_AGENT_NFT_ALICE_PRIVATE_KEY;
 const ZG_AGENT_NFT_BOB_PRIVATE_KEY = process.env.ZG_AGENT_NFT_BOB_PRIVATE_KEY;
 
+// Hardhat設定ファイル
 const config: HardhatUserConfig = {
   paths: {
-    artifacts: "build/artifacts",
-    cache: "build/cache",
-    sources: "contracts",
-    deploy: "scripts/deploy",
+    artifacts: 'build/artifacts',
+    cache: 'build/cache',
+    sources: 'contracts',
+    deploy: 'scripts/deploy',
   },
   solidity: {
-    version: "0.8.20",
+    version: '0.8.20',
     settings: {
       optimizer: {
         enabled: true,
-        runs: 200
-      }
-    }
+        runs: 200,
+      },
+    },
   },
   networks: {
     hardhat: {
@@ -34,34 +35,34 @@ const config: HardhatUserConfig = {
       gas: 100000000,
       accounts: [
         {
-          privateKey: ZG_AGENT_NFT_CREATOR_PRIVATE_KEY || "",
-          balance: "1000000000000000000000",
+          privateKey: ZG_AGENT_NFT_CREATOR_PRIVATE_KEY || '',
+          balance: '1000000000000000000000',
         },
         {
-          privateKey: ZG_AGENT_NFT_ALICE_PRIVATE_KEY || "",
-          balance: "1000000000000000000000",
+          privateKey: ZG_AGENT_NFT_ALICE_PRIVATE_KEY || '',
+          balance: '1000000000000000000000',
         },
         {
-          privateKey: ZG_AGENT_NFT_BOB_PRIVATE_KEY || "",
-          balance: "1000000000000000000000",
-        }
+          privateKey: ZG_AGENT_NFT_BOB_PRIVATE_KEY || '',
+          balance: '1000000000000000000000',
+        },
       ],
       live: false,
       saveDeployments: true,
-      tags: ["test", "local"]
+      tags: ['test', 'local'],
     },
     zgTestnet: {
-      url: "https://evmrpc-testnet.0g.ai",
-      accounts: [ZG_TESTNET_PRIVATE_KEY || ""],
+      url: 'https://evmrpc-testnet.0g.ai',
+      accounts: [ZG_TESTNET_PRIVATE_KEY || ''],
       chainId: 16600,
       live: true,
       saveDeployments: true,
-      tags: ["staging"]
+      tags: ['staging'],
     },
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
-    currency: "USD",
+    currency: 'USD',
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
@@ -89,18 +90,18 @@ const config: HardhatUserConfig = {
   external: {
     contracts: [
       {
-        artifacts: "build/artifacts",
+        artifacts: 'build/artifacts',
       },
     ],
     deployments: {
-      hardhat: ["deployments/hardhat"],
-      zgTestnet: ["deployments/zgTestnet"],
+      hardhat: ['deployments/hardhat'],
+      zgTestnet: ['deployments/zgTestnet'],
     },
   },
   typechain: {
-    outDir: "typechain-types",
-    target: "ethers-v6",
-  }
+    outDir: 'typechain-types',
+    target: 'ethers-v6',
+  },
 };
 
 export default config;
