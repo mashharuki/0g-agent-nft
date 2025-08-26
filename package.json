@@ -9,7 +9,7 @@
     "verify": "npx hardhat verify",
     "coverage": "npx hardhat coverage",
     "upgrade": "npx hardhat run scripts/upgrade.ts",
-    "format": "npx prettier --write ."
+    "format": "npx prettier --plugin=prettier-plugin-solidity --write ."
   },
   "keywords": [],
   "author": "wei <wei.wu.life@gmail.com>",

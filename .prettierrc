@@ -7,13 +7,13 @@
   "useTabs": false,
   "overrides": [
     {
-      "files": "*.ts",
+      "files": "**/*.ts",
       "options": {
         "parser": "typescript"
       }
     },
     {
-      "files": "*.sol",
+      "files": "**/*.sol",
       "options": {
         "tabWidth": 2,
         "useTabs": false,
